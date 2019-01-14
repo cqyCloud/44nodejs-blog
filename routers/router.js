@@ -1,21 +1,31 @@
 const Router = require('koa-router')
+//拿到操作 user 表的逻辑对象
+const user = require('../control/user')
+
 const router = new Router();
 
-//设置主页 
+//设计主页 
 router.get("/",async (ctx) => {
   //需要title属性
   await ctx.render('index',{
     title:"这是一个正经的title"
   });
-  // ctx.body = "这是index页面"
 })
-//主要用来处理 用户登录 用户注册
+//主要用来处理返回 用户登录 用户注册
 router.get(/^\/user\/(?=reg|login)/,async (ctx) =>{
   //show 为true 则显示注册 false 显示登录
   const show = /reg$/.test(ctx.path)
-  await ctx.render("register",{show})
+  await ctx.render("register",{show:show})
 
 })
+
+//注册用户
+router.post("/user/reg", user.reg)
+
+//登录用户
+router.post("/user/login",user.login)
+
+
 module.exports = router;
 
 //RESTful

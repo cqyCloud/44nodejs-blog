@@ -92,17 +92,70 @@ exports.login = async ctx => {
         status:"密码不正确,登录失败"
       })
     }
+    // console.log(data[0]._id)
     //让用户在他的cookie里设置 username password 加密后的密码 权限
+    ctx.cookies.set("username", username, {
+      domain:"loaclhost",
+      path:"/",
+      maxAge:36e5,
+      httpOnly:true,//true 不让客户端能访问这个cookie
+      overwrite:false,
+      // signed:true,
+    })
 
-    
+    //用户在数据库的 _id 值
+    ctx.cookies.set("uid", data[0]._id, {
+      domain:"loaclhost",
+      path:"/",
+      maxAge:36e5,
+      httpOnly:true,//true 不让客户端能访问这个cookie
+      overwrite:false,
+      // signed:false,
+    })
+
+    ctx.session = {
+      username,
+      uid:data[0]._id
+    }
+
+
     //登录成功
     await ctx.render("isOk",{
       status:"登录成功"
     })
+
   })
   .catch(async err => {
     await ctx.render('isOk',{
       status:"登录失败"
     })
   })
+}
+
+//确定用户的状态 保持用户状态
+exports.keepLog = async (ctx,next) => {
+  if (ctx.session.isNew) { //session 没有数据
+    if (ctx.cookies.get("username")) {
+      ctx.session = {
+        username:ctx.cookies.get('username'),
+        uid:ctx.cookies.get("uid")
+      }
+    }
+    
+  }
+  await next()
+}
+
+//用户退出中间件
+exports.logout = async ctx => {
+  ctx.session = null
+  ctx.cookies.set("username",null,{
+    maxAge:0
+  })
+
+  ctx.cookies.set("uid",null,{
+    maxAge:0
+  })
+  //在后台做重定向到 根
+  ctx.redirect("/")
 }

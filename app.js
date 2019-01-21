@@ -5,18 +5,36 @@ const router = require('./routers/router');
 const logger = require('koa-logger');
 const body = require('koa-body')
 const { join } = require('path');
+const session = require('koa-session')
 
 //生成Koa实例
 const app = new Koa();
 
+app.keys = ["风雨是个大帅比"];
+
+//session 的配置对象
+const CONFIG = {
+  key:"Sid",
+  maxAge:36e5,//毫秒
+  overwrite:true,
+  httpOnly:true,
+  // signed:true,
+  rolling:true
+}
+
 //注册日志模块
 app.use(logger());
+
+//注册session
+app.use(session(CONFIG,app))
 
 //配置 koa-body 处理 post 请求数据
 app.use(body())
 
 //设置静态资源目录
 app.use(static(join(__dirname,'public')))
+
+//配置视图模块
 app.use(views(join(__dirname,'views'), { extension:'pug' }))
 
 // 注册路由信息

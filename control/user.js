@@ -1,9 +1,8 @@
-const { db } = require("../Schema/config")
-const UserSchema = require("../Schema/user")
-const encrypt = require('../util/encrypt')
+const Article = require('../Models/article')
+const User = require('../Models/user')
+const Comment = require('../Models/comment')
 
-//通过 db 对象创建操作 user 数据库的模型对象
-const User = db.model("users",UserSchema)
+const encrypt = require('../util/encrypt')
 
 //用户注册
 exports.reg = async (ctx) => {
@@ -11,8 +10,8 @@ exports.reg = async (ctx) => {
   const user = ctx.request.body;
   const username = user.username
   const password = user.password
-  console.log("用户登录名" + username)
-  console.log("用户登录密码" + password) 
+  // console.log("用户登录名" + username)
+  // console.log("用户登录密码" + password) 
   //注册时 应该干嘛  一下操作假设 格式 符合
   //1. 去数据库 user 先查询当前发过来的 username 是否存在
   // 
@@ -32,7 +31,9 @@ exports.reg = async (ctx) => {
       //保存到数据库之前需要先加密,encrypt模块是自定义加密模块
       const _user = new User({
         username,
-        password:encrypt(password)
+        password:encrypt(password),
+        commentNum:0,
+        articleNum:0,
       })
       _user.save((err,data) => {
         if (err) {
@@ -45,6 +46,7 @@ exports.reg = async (ctx) => {
     })
   })
   .then(async data => {
+    // console.log(data)
     if (data) {
       //注册成功
       await ctx.render("isOk",{
@@ -115,7 +117,9 @@ exports.login = async ctx => {
 
     ctx.session = {
       username,
-      uid:data[0]._id
+      uid:data[0]._id,
+      avatar:data[0].avatar,
+      role:data[0].role
     }
 
 
@@ -136,9 +140,15 @@ exports.login = async ctx => {
 exports.keepLog = async (ctx,next) => {
   if (ctx.session.isNew) { //session 没有数据
     if (ctx.cookies.get("username")) {
+
+      let uid = ctx.cookies.get("uid")
+      const avatar = await User.findById(uid)
+        .then(data => data.avatar)
+
       ctx.session = {
         username:ctx.cookies.get('username'),
-        uid:ctx.cookies.get("uid")
+        uid,
+        avatar
       }
     }
     
@@ -158,4 +168,26 @@ exports.logout = async ctx => {
   })
   //在后台做重定向到 根
   ctx.redirect("/")
+}
+
+//用户的头像上传
+exports.upload = async ctx => {
+  const filename = ctx.req.file.filename
+  let data = {}
+
+  await User.update({_id:ctx.session.uid},{$set:{avatar:"/avatar/" + filename}},(err,res) => {
+    if (err){
+      data = {
+        status:0,
+        message:"上传失败"
+      }
+    }else{
+      data = {
+        status:1,
+        message:"上传成功"
+      }
+    }
+  })
+  // console.log(data)
+  ctx.body = data
 }

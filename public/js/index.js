@@ -4,19 +4,19 @@ layui.use(["element", "laypage"], () => {
   const $ = layui.$
   
   element.tabDelete('demo', 'xxx')
- 
 
-
+  
   laypage.render({
     elem: "laypage",
     count: $("#laypage").data("maxnum"),
-    limit: 2,
+    limit: 10,
     groups: 3,
     curr: location.pathname.replace("/page/", ""),
     jump(obj, f){
       $("#laypage a").each((i, v) => {
         let pageValue = `/page/${$(v).data("page")}`
         v.href = pageValue
+        // console.log(pageValue)
       })
     }
   })

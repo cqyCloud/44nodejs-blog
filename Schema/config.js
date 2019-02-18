@@ -7,6 +7,7 @@ mongoose.Promise = global.Promise;
 
 //把mongoose 的 schema 取出来
 const Schema = mongoose.Schema;
+// console.log(Schema)
 
 db.on("error", () => {
   console.log("连接数据库失败")
@@ -15,9 +16,6 @@ db.on("error", () => {
 db.on("open", () => {
   console.log("blogproject 数据库连接成功")
 })
-
-
-
 
 
 module.exports = {

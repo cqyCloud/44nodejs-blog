@@ -14,7 +14,7 @@ layui.use(['layedit', 'layer', 'element'], function(){
   $(".layui-unselect.layui-layedit-tool").hide()
 
   
-
+  console.log($())
   $(".comment button").click(async () => {
     let content = layedit.getContent(idx).trim()
 

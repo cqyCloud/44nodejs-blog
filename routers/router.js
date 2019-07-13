@@ -67,9 +67,6 @@ router.get("/user/users",user.keepLog,admin.userslist)
 //管理员后台:删除用户
 router.del("/user/:id",user.keepLog,admin.del)
 
-//书写Vue接口
-// router.get("/vueProject")
-
 router.get("*",async ctx => {
   await ctx.render("404",{
     title:"404"

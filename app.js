@@ -24,7 +24,7 @@ const CONFIG = {
 }
 
 //注册日志模块
-// app.use(logger());
+app.use(logger());
 
 //注册资源压缩模块
 app.use(compress({

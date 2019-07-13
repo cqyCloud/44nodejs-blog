@@ -28,6 +28,7 @@
     "koa-static": "^5.0.0",
     "koa-view": "^2.1.2",
     "koa-views": "^6.1.5",
+    "@koa/cors": "^3.0.0",
     "mongoose": "^5.4.3",
     "pug": "^2.0.3"
   }
